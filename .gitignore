@@ -1,19 +1,121 @@
-# WordPress Content Dir Gitignore
+# ============================================
+# .gitignore for WordPress wp-content directory
+# acmeitcentre.in | Hostinger Deployment
+# ============================================
+
+# ---------------------------
+# WordPress Core & Sensitive
+# ---------------------------
+wp-config.php
+wp-config-sample.php
+wp-settings.php
+*.php~
+
+# ---------------------------
+# WordPress Uploads (user media)
+# ---------------------------
 uploads/
 upgrade/
 cache/
 languages/
 
-# Development & System Files
-node_modules/
+# ---------------------------
+# Security & Sensitive Files
+# ---------------------------
 .env
-.DS_Store
-Thumbs.db
-error_log
-*.bak
-*.tmp
+.env.local
+.env.production
+*.pem
+*.key
+*.cert
+*.p12
+auth.json
+secrets.json
 
-# Plugin Backups & Logs
+# ---------------------------
+# WordPress Plugin & Theme Junk
+# ---------------------------
+# Backup plugins
 backups/
 updraft/
+wp-content/backups/
+
+# Cache plugins
+wp-content/cache/
+wp-content/et-cache/
+wp-content/w3tc-config/
+wp-content/wp-cache-config.php
+
+# Security plugin logs
 wflogs/
+.tmb/
+
+# ---------------------------
+# OS & System Files
+# ---------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ---------------------------
+# Development & Build Files
+# ---------------------------
+node_modules/
+vendor/
+.sass-cache/
+.cache/
+dist/
+build/
+*.min.css.map
+*.min.js.map
+
+# ---------------------------
+# IDE & Editor Files
+# ---------------------------
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+.editorconfig
+
+# ---------------------------
+# Logs & Temp Files
+# ---------------------------
+error_log
+*.log
+*.logs
+*.bak
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# ---------------------------
+# Composer & NPM
+# ---------------------------
+composer.lock
+package-lock.json
+yarn.lock
+
+# ---------------------------
+# Git & Deploy Specific
+# ---------------------------
+.git/
+.gitattributes
+deploy.php
+deployer.phar
+Capfile
+
+# ---------------------------
+# WordPress Debug & Temp
+# ---------------------------
+debug.log
+wp-content/debug.log
+*.orig
