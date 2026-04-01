@@ -1,30 +1,34 @@
 # ============================================
-# .gitignore for WordPress wp-content directory
-# acmeitcentre.in | Hostinger Deployment
+# WordPress Safe .gitignore (Final Stable)
 # ============================================
 
 # ---------------------------
-# WordPress Core & Sensitive
+# WordPress Sensitive
 # ---------------------------
 wp-config.php
-wp-config-sample.php
-wp-settings.php
-*.php~
-
-# ---------------------------
-# WordPress Uploads (user media)
-# ---------------------------
-uploads/
-upgrade/
-cache/
-languages/
-
-# ---------------------------
-# Security & Sensitive Files
-# ---------------------------
 .env
-.env.local
-.env.production
+.env.*
+*.env
+
+# ---------------------------
+# Uploads & Runtime
+# ---------------------------
+wp-content/uploads/
+wp-content/upgrade/
+wp-content/cache/
+
+# ---------------------------
+# Logs
+# ---------------------------
+*.log
+*.logs
+debug.log
+wp-content/debug.log
+error_log
+
+# ---------------------------
+# Security Files
+# ---------------------------
 *.pem
 *.key
 *.cert
@@ -33,63 +37,35 @@ auth.json
 secrets.json
 
 # ---------------------------
-# WordPress Plugin & Theme Junk
-# ---------------------------
-# Backup plugins
-backups/
-updraft/
-wp-content/backups/
-
-# Cache plugins
-wp-content/cache/
-wp-content/et-cache/
-wp-content/w3tc-config/
-wp-content/wp-cache-config.php
-
-# Security plugin logs
-wflogs/
-.tmb/
-
-# ---------------------------
-# OS & System Files
+# OS Files
 # ---------------------------
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 desktop.ini
 
 # ---------------------------
-# Development & Build Files
+# IDE
+# ---------------------------
+.vscode/
+.idea/
+
+# ---------------------------
+# Node / Build
 # ---------------------------
 node_modules/
-vendor/
-.sass-cache/
-.cache/
 dist/
 build/
-*.min.css.map
-*.min.js.map
+.cache/
+.sass-cache/
 
 # ---------------------------
-# IDE & Editor Files
+# PHP / Composer
 # ---------------------------
-.idea/
-.vscode/
-*.sublime-project
-*.sublime-workspace
-*.code-workspace
-.editorconfig
+# vendor/   ← only ignore if NOT using composer
 
 # ---------------------------
-# Logs & Temp Files
+# Temp
 # ---------------------------
-error_log
-*.log
-*.logs
 *.bak
 *.tmp
 *.temp
@@ -98,24 +74,30 @@ error_log
 *~
 
 # ---------------------------
-# Composer & NPM
+# WP Plugin Junk
 # ---------------------------
-composer.lock
-package-lock.json
-yarn.lock
+wp-content/backups/
+wp-content/et-cache/
+wp-content/w3tc-config/
+wp-content/wp-cache-config.php
+wflogs/
 
 # ---------------------------
-# Git & Deploy Specific
+# AI SYSTEM (IMPORTANT)
 # ---------------------------
-.git/
-.gitattributes
+/wp-content/ai/
+
+# ---------------------------
+# Deploy
+# ---------------------------
 deploy.php
 deployer.phar
 Capfile
 
-# ---------------------------
-# WordPress Debug & Temp
-# ---------------------------
-debug.log
-wp-content/debug.log
-*.orig
+# ============================================
+# DO NOT IGNORE (IMPORTANT)
+# ============================================
+# .git/
+# wp-content/plugins/
+# wp-content/themes/
+# README.md

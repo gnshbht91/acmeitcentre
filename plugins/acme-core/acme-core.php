@@ -46,6 +46,10 @@ if (file_exists(ACME_PATH . 'includes/admin/settings.php')) {
     require_once ACME_PATH . 'includes/admin/settings.php';
 }
 
+if (file_exists(ACME_PATH . 'includes/admin/settings-page.php')) {
+    require_once ACME_PATH . 'includes/admin/settings-page.php';
+}
+
 if (file_exists(ACME_PATH . 'includes/init.php')) {
     require_once ACME_PATH . 'includes/init.php';
 }

@@ -81,33 +81,5 @@ add_action('admin_menu', 'acme_register_admin_menu');
  * ACME Admin Dashboard Callback
  */
 function acme_admin_dashboard_page() {
-    ?>
-    <div class="wrap">
-        <h1>ACME Dashboard</h1>
-        <form method="post" action="">
-            <h2>Contact Settings</h2>
-            <table class="form-table">
-                <tr>
-                    <th scope="row"><label for="acme_phone">Phone Number</label></th>
-                    <td><input name="acme_phone" type="text" id="acme_phone" value="" class="regular-text"></td>
-                </tr>
-                <tr>
-                    <th scope="row"><label for="acme_email">Email Address</label></th>
-                    <td><input name="acme_email" type="email" id="acme_email" value="" class="regular-text"></td>
-                </tr>
-                <tr>
-                    <th scope="row"><label for="acme_address">Office Address</label></th>
-                    <td><textarea name="acme_address" id="acme_address" rows="5" cols="50" class="large-text"></textarea></td>
-                </tr>
-                <tr>
-                    <th scope="row"><label for="acme_map">Google Map Link</label></th>
-                    <td><input name="acme_map" type="url" id="acme_map" value="" class="regular-text"></td>
-                </tr>
-            </table>
-            <p class="submit">
-                <input type="submit" name="submit" id="submit" class="button button-primary" value="Save Settings">
-            </p>
-        </form>
-    </div>
-    <?php
+    acme_render_settings_page();
 }

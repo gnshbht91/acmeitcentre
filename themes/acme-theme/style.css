@@ -1,0 +1,38 @@
+/*
+Theme Name: ACME Theme
+Author: ACME
+Version: 1.0
+Description: Custom ACME Theme
+*/
+
+@font-face {
+    font-family: 'ACMEFont';
+    src: url('assets/fonts/Acme-Sans-Regular-v1.woff2') format('woff2');
+    font-weight: normal;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'ACMEFont';
+    src: url('assets/fonts/Acme-Sans-Bold-v1.woff2') format('woff2');
+    font-weight: bold;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'ACMEFont';
+    src: url('assets/fonts/Acme-Sans-Light-v1.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+}
+
+@font-face {
+    font-family: 'ACMEFont';
+    src: url('assets/fonts/Acme-Sans-Medium-v1.woff2') format('woff2');
+    font-weight: 500;
+    font-style: normal;
+}
+
+body {
+    font-family: 'ACMEFont', sans-serif;
+}
