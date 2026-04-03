@@ -18,9 +18,9 @@ EXECUTION: ONE TASK ONLY
 
 # 🧭 SYSTEM STATE
 
-CURRENT PHASE: 3
-CURRENT TASK: 3.5 Add WhatsApp settings
-LAST COMPLETED: 3.4 Settings page
+CURRENT PHASE: 5
+CURRENT TASK: 5.4 Get batches
+LAST COMPLETED: 5.3 Get course
 
 ---
 
@@ -111,11 +111,13 @@ ALL TASKS MUST FOLLOW:
 3.6.1 HARDEN_SAVE_LOGIC
 3.6.2 STRICT_INPUT_CHECK
 3.6.3 SYSTEM-GIT_INITIAL_PUSH
-3.7 Add business fields
-3.8 Save settings
+3.7 Add business fields (with Google Map link)
+3.8 Save settings (extend existing)
 3.9 Create getter
 3.10 Add caching
 3.11 Verify frontend
+3.11.1 Verify frontend (final QA)
+3.11.1.1 FIX_SETTINGS_VALUE_BINDING
 
 ## TASK → FILE MAPPING (EXECUTION CONTROL)
 
@@ -148,11 +150,12 @@ NO EXTRA FILE ACCESS
 4.2 Create logs table
 4.3 Create audit table
 4.4 Setup dbDelta
+4.4.1 VERIFY_DB_TABLES
 4.5 Activation hook
 4.6 Store DB version
 4.7 Migration check
 4.8 Verify tables
-
+5.6.2_FIX_INSERT_VALIDATION.md
 ---
 
 ## PHASE 5 — DATA ACCESS LAYER (DAL)
@@ -163,6 +166,7 @@ NO EXTRA FILE ACCESS
 5.4 Get batches
 5.5 Get leads
 5.6 Wrapper functions
+5.6.0 CREATE_HELPERS_FOLDER
 5.7 Remove theme queries
 5.8 Migration check
 5.9 Verify
@@ -172,6 +176,8 @@ NO EXTRA FILE ACCESS
 ## PHASE 6 — COURSE ENGINE
 
 6.1 Define structure
+6.1.1 LOAD-CORE-LOADER
+6.1.3 REMOVE LOADER CONDITION
 6.2 Batch query
 6.3 Instructor link
 6.4 Optimize queries

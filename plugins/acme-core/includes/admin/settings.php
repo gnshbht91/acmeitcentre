@@ -72,3 +72,28 @@ function acme_register_settings_option() {
     }
 }
 add_action('init', 'acme_register_settings_option');
+
+/**
+ * Get ACME settings safely
+ */
+function acme_get_settings() {
+
+    $cache_key = 'acme_settings';
+
+    $cached = wp_cache_get($cache_key);
+
+    if ($cached !== false) {
+        return $cached;
+    }
+
+    $settings = get_option('acme_settings');
+
+    if (!is_array($settings)) {
+        $settings = array();
+    }
+
+    wp_cache_set($cache_key, $settings);
+
+    return $settings;
+}
+

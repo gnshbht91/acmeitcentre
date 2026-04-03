@@ -74,6 +74,13 @@ IF FAIL:
 
 → STOP
 
+IF CURRENT TASK DOES NOT MATCH TASK FILE:
+
+→ IMMEDIATE HARD STOP
+→ DO NOT CONTINUE
+→ DO NOT OVERRIDE
+→ DO NOT EXECUTE ANY STEP
+
 ---
 
 # STEP 5 — SECURITY PRE-CHECK
@@ -125,11 +132,19 @@ YOU MUST:
 
 * Create backup snapshot of original code
 
+# 📸 PRE-WRITE SNAPSHOT LAW (ENFORCEMENT)
+
+YOU MUST:
+
+* Take full file backup BEFORE any change
+
 IF NOT POSSIBLE:
 
-→ STOP
+→ STOP EXECUTION
 
----
+IF SNAPSHOT NOT CONFIRMED:
+
+→ DO NOT WRITE CODE
 
 # STEP 9 — WRITE PERMISSION CHECK (CRITICAL)
 
@@ -301,5 +316,36 @@ NO RETRY
 EXECUTE EXACT TASK ONLY
 
 ---
+# FILE EXISTENCE PROTECTION (CRITICAL)
+
+FOR EACH FILE:
+
+IF FILE EXISTS:
+
+→ READ FULL FILE
+
+→ CHECK:
+    - Is change additive? (allowed)
+    - Is change destructive? (NOT allowed)
+
+IF DESTRUCTIVE (overwrite, replace):
+
+→ STOP
+
+ALLOWED:
+
+* Add require_once
+* Add function
+* Add hook
+
+NOT ALLOWED:
+
+* Rewrite file
+* Delete existing code
+* Replace structure
+
+IF UNSURE:
+
+→ STOP
 
 # END

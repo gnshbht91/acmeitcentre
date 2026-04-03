@@ -61,6 +61,44 @@ IF MISMATCH:
 
 ---
 
+# 🔒 STATE LOCK RULE (CRITICAL)
+
+IF TASK_BOARD CURRENT TASK ≠ EXECUTED TASK:
+
+→ STOP EXECUTION
+→ NO EXCEPTION
+
+---
+# 🔒 FILE OVERWRITE PROTECTION LAW (CRITICAL)
+
+BEFORE WRITING ANY FILE:
+
+YOU MUST:
+
+* Check if file already exists
+
+IF FILE EXISTS:
+
+→ YOU MUST NOT:
+    - Recreate file
+    - Overwrite file
+    - Replace full content
+
+→ YOU MUST:
+    - Modify only required part
+    - Preserve existing structure
+
+IF FILE IS CORE SYSTEM FILE (e.g. loader.php, main plugin file):
+
+→ FULL FILE OVERWRITE = STRICTLY FORBIDDEN
+
+IF OVERWRITE RISK DETECTED:
+
+→ STOP EXECUTION
+→ REPORT
+
+VIOLATION = CRITICAL FAILURE
+
 # 📋 TASK AUTHORITY (CRITICAL)
 
 SOURCE OF TRUTH:

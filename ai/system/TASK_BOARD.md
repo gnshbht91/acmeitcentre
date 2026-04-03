@@ -4,7 +4,8 @@
 
 ## CURRENT PHASE
 
-PHASE 3 — SETTINGS SYSTEM
+PHASE 6 — COURSE ENGINE (COMPLETE)
+NEXT: PHASE 7.1
 
 ---
 
@@ -18,7 +19,7 @@ COMPLETED
 
 ---
 
-## COMPLETED TASKS (PHASE 1, 2 & 3)
+## COMPLETED TASKS (PHASE 1, 2, 3, 4 & 5)
 
 * 1.1 Create plugin folder
 * 1.2 Create main plugin file
@@ -68,6 +69,47 @@ COMPLETED
 * 3.6 Save settings
 * 3.6.1 Harden save logic (Completed)
 * 3.6.2 Strict input check (Completed)
+* 3.7 Add business fields (Completed)
+* 3.8 Extend save logic (Completed)
+* 3.9 Create getter (Completed)
+* 3.10 Add caching (Completed)
+* 3.11 Verify frontend (Completed)
+* 3.11.1.1 Fix settings value binding (Completed)
+* 4.1 Create leads table (Completed)
+* 4.2 Create logs table (Completed)
+* 4.3 Create audit table (Completed)
+* 4.4 Execute dbDelta (Completed)
+* 4.4.1 Verify DB tables (Completed)
+* 4.5 Activation hook (Completed)
+* 5.1 Create lead form (Completed)
+* 5.2 Process form (Completed)
+* 5.3 Insert lead into DB (Completed)
+* 5.4 Add log entry (Completed)
+* 5.5 Add audit log (Completed)
+* 5.6 Add success message (Completed)
+* 5.6.1 Fix success chain (Completed)
+* 5.6.2 Fix insert validation (Completed)
+* 4.6 Store DB version (Completed)
+* 4.7 Migration check (Completed)
+* 4.7.1 Migration lock and success (Completed)
+* 4.7.2 Robust table verification (Completed)
+* 4.8 Verify tables (Completed)
+
+* 5.1 Create DAL class (Completed)
+* 5.2 Get courses (Completed)
+* 5.3 Get course (Completed)
+* 5.4 Get batches (Completed)
+* 5.5 Get leads (Completed)
+* 5.6.0 Create helpers folder (Completed)
+* 5.6 Wrapper functions (Completed)
+* 5.7 Remove theme queries (Completed)
+* 5.8 Migration check (Completed)
+* 5.9 Verify (Completed)
+* 6.1 Define course engine structure (Completed)
+* 6.1.1 Fix loader registration (Completed)
+* 6.1.2 Load core loader (Completed)
+* 6.1.2 Remove loader condition (Completed)
+* 6.2.0 Create batch-specific DAL file (Completed)
 
 ## COMPLETED UI TASKS (SECONDARY)
 
@@ -80,15 +122,25 @@ COMPLETED
 
 ---
 
-## CURRENT TASK
-
-3.7 Add social fields
+* 6.2 Get batches by course (Completed)
+* 6.3 Instructor link (Completed)
+* 6.4 Audit and stabilize (Completed)
+* PHASE-6.4: Optimize queries (Completed)
+* SYSTEM-ENFORCE-STATE-LOCK: State Lock (Completed)
+* 6.5 Add caching (Completed)
+* 6.6 Invalidate cache (Completed)
+* 6.7 Fix DAL to use CPT (Completed)
 
 ---
 
-## NEXT TASKS (PHASE 3)
+## CURRENT TASK
 
-3.7 Add social fields
+→ PHASE 7.1
+
+---
+
+## NEXT TASKS (PHASE 5)
+
 
 ---
 

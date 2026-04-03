@@ -333,5 +333,19 @@ YOU WRITE:
 * CONSISTENT CODE
 
 ---
+# 🚫 FILE OVERWRITE SAFETY LAW
+
+YOU MUST NOT:
+
+* Replace entire file content
+* Remove existing logic without task instruction
+
+YOU MUST:
+
+* Append or minimally modify code
+
+IF FULL FILE CHANGE DETECTED:
+
+→ STOP
 
 # 🔚 END OF CODE QUALITY RULES
