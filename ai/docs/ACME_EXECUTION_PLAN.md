@@ -184,6 +184,7 @@ NO EXTRA FILE ACCESS
 6.5 Add caching
 6.6 Invalidate cache
 6.7 Verify
+6.8 GIT-CHECKPOINT
 
 ---
 

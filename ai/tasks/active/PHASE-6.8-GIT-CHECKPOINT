@@ -1,0 +1,50 @@
+# ============================================
+# TASK: PHASE-6.8-GIT-CHECKPOINT.md
+# ============================================
+
+GOAL:
+Safely commit and push PHASE-6.8 stabilization changes and create version tag
+
+STEP:
+Create clean commit and tag for PHASE-6.8
+
+FILES:
+- modified plugin files 
+- system files (DEV_LOG, tasks)
+
+EXPECTED_OUTPUT:
+- commit created
+- pushed to repo
+- tag created (phase-6.8-stable)
+
+TASK_VALIDATION:
+- Must run after Phase 6.8 completion
+- If pending errors → STOP
+
+DUPLICATION_CHECK:
+- If already committed → STOP
+
+PRECONDITION_CHECK:
+- system stable → YES
+- no PHP errors → YES
+
+STRICT_SCOPE:
+- No code changes
+- Only git operations
+
+CONSTRAINTS:
+- No force push
+- No unwanted files
+
+EXCLUDE_LIST:
+- /tmp/
+- debug scripts
+
+FAIL_CONDITIONS:
+- sensitive data included
+- push failed
+
+SUCCESS_CRITERIA:
+- repo updated
+- tag pushed
+- clean history
