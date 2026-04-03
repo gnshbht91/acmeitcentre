@@ -29,16 +29,6 @@ function acme_register_admin_menu() {
         'acme_admin_dashboard_page'
     );
 
-    // Add Settings Submenu
-    add_submenu_page(
-        'acme-dashboard',
-        'Settings',
-        'Settings',
-        'manage_options',
-        'acme-settings',
-        'acme_admin_settings_page'
-    );
-
     // Add Courses Submenu
     add_submenu_page(
         'acme-dashboard',
@@ -82,6 +72,16 @@ function acme_register_admin_menu() {
         'FAQ',
         'manage_options',
         'edit.php?post_type=faq'
+    );
+
+    // Add Settings Submenu
+    add_submenu_page(
+        'acme-dashboard',
+        'Settings',
+        'Settings',
+        'manage_options',
+        'acme-settings',
+        'acme_admin_settings_page'
     );
 
 }

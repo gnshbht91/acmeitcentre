@@ -3,13 +3,13 @@ jQuery(document).ready(function($) {
         return;
     }
 
-    let rowIndex = $('#acme-social-links-container .acme-social-row').length;
+    let rowIndex = $('#acme-social-links-container .acme-social-item').length;
 
     $('#acme-add-social-row').on('click', function() {
         const rowHTML = `
-            <div class="acme-social-row" style="margin-bottom: 10px;">
-                <input type="text" name="acme_settings[social_links][${rowIndex}][type]" placeholder="Platform (e.g. Facebook)" value="" class="regular-text">
-                <input type="url" name="acme_settings[social_links][${rowIndex}][url]" placeholder="URL" value="" class="regular-text">
+            <div class="acme-social-item" style="margin-bottom: 10px;">
+                <input type="text" name="acme_settings[social_links][${rowIndex}][type]" placeholder="Platform" value="" class="regular-text" style="width: 150px;">
+                <input type="url" name="acme_settings[social_links][${rowIndex}][url]" placeholder="URL" value="" class="regular-text" style="width: 250px;">
                 <button type="button" class="button acme-remove-social-row">Remove</button>
             </div>
         `;
@@ -18,6 +18,6 @@ jQuery(document).ready(function($) {
     });
 
     $(document).on('click', '.acme-remove-social-row', function() {
-        $(this).closest('.acme-social-row').remove();
+        $(this).closest('.acme-social-item').remove();
     });
 });

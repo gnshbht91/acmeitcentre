@@ -130,13 +130,18 @@ COMPLETED
 * 6.5 Add caching (Completed)
 * 6.6 Invalidate cache (Completed)
 * 6.7 Fix DAL to use CPT (Completed)
+* 6.8 GIT-CHECKPOINT (Completed)
+* 6.9-FIX-ADMIN-MENU-ORDER (Completed)
+* 6.10 UI-SETTINGS-IMPROVEMENT (Completed)
+* 6.11 UI-HARDENING (Completed)
+* 6.12 SETTINGS-VALIDATION (Completed)
+* 6.13-VALIDATION-ATOMIC-SAVE (Completed)
+
 
 ---
 
 ## CURRENT TASK
-
-6.8 GIT-CHECKPOINT
-
+* 6.14-GIT-CHECKPOINT (Completed)
 ---
 
 ## PHASE 7 — APPLICATION LAYER

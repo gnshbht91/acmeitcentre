@@ -154,8 +154,13 @@ DATA-FIRST (CPT FIRST)
 * PHASE-6.6: Invalidate cache integration (Completed)
 * PHASE-6.7: DAL updated to CPT-based logic (Completed)
 * PHASE-6.7-FIX: Instructor query fixed (Completed)
+* PHASE-6.10: UI Settings Improvement (Completed)
+* PHASE-6.11: UI Hardening (Completed)
+* PHASE-6.12: Settings Validation (Completed)
+* PHASE-6.13: Validation Atomic Save (Completed)
 * Current Phase: → PHASE 6 COMPLETE
-* Current Task: → PHASE 7.1
+* Current Task: → PHASE 7.0 — SETTINGS STABILIZATION
+* Next: → PHASE 7.1
 
 ---
 ## STATE VALIDITY RULE
