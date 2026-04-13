@@ -14,6 +14,8 @@ function acme_get_leads_table_sql() {
         course VARCHAR(255) DEFAULT '' NOT NULL,
         source VARCHAR(100) DEFAULT '' NOT NULL,
         status VARCHAR(50) DEFAULT 'new' NOT NULL,
+        note TEXT NULL,
+        user_id INT NULL,
         created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
         PRIMARY KEY (id)
     ) $charset_collate;";

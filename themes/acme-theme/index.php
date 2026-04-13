@@ -1,7 +1,11 @@
 <?php get_header(); ?>
-
 <main>
-    <p>Welcome to ACME Theme</p>
+<?php
+	if ( have_posts() ) :
+	while ( have_posts() ) : the_post();
+	the_content();
+	endwhile;
+	endif;
+	?>
 </main>
-
-<?php get_footer(); ?>
+<?php get_footer(); ?></main>

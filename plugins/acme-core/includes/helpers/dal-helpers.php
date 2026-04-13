@@ -13,10 +13,11 @@ function acme_get_course($id) {
     return $dal->get_course($id);
 }
 
-function acme_get_leads($limit = 20) {
+function acme_get_leads_legacy($limit = 20) {
     $dal = new ACME_DAL();
     return $dal->get_leads($limit);
 }
+
 
 function acme_get_batches_by_course($course_id) {
     $dal = new ACME_DAL();
