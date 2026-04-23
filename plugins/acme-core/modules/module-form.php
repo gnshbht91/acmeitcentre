@@ -58,41 +58,65 @@ function acme_render_form()
     </form>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            var form = document.querySelector('.acme-form');
-            if (!form) return;
+        (function() {
+            function initAcmeForm() {
+                var form = document.querySelector('.acme-form');
+                if (!form || form.dataset.acmeBound === "true") return;
+                form.dataset.acmeBound = "true";
 
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
+                form.addEventListener('submit', function (e) {
+                    e.preventDefault();
 
-                // Populate tracking fields
-                document.getElementById('acme_url').value = window.location.href;
-                var params = new URLSearchParams(window.location.search);
-                document.getElementById('acme_utm_source').value = params.get('utm_source') || '';
-                document.getElementById('acme_utm_medium').value = params.get('utm_medium') || '';
-                document.getElementById('acme_utm_campaign').value = params.get('utm_campaign') || '';
+                    // Populate tracking fields with safety checks
+                    var urlField = document.getElementById('acme_url');
+                    var sourceField = document.getElementById('acme_utm_source');
+                    var mediumField = document.getElementById('acme_utm_medium');
+                    var campaignField = document.getElementById('acme_utm_campaign');
 
-                var formData = new FormData(form);
-                formData.append('action', 'acme_form_submit');
+                    if (urlField) urlField.value = window.location.href;
+                    
+                    var params = new URLSearchParams(window.location.search);
+                    if (sourceField) sourceField.value = params.get('utm_source') || '';
+                    if (mediumField) mediumField.value = params.get('utm_medium') || '';
+                    if (campaignField) campaignField.value = params.get('utm_campaign') || '';
 
-                fetch('<?php echo esc_url(admin_url('admin-ajax.php')); ?>', {
-                    method: 'POST',
-                    body: formData
-                })
-                .then(function (res) { return res.json(); })
-                .then(function (response) {
-                    if (response.success) {
-                        alert(response.data.message);
-                        form.reset();
-                    } else {
-                        alert((response.data && response.data.message) || 'Submission failed');
-                    }
-                })
-                .catch(function () {
-                    alert('Request failed. Please try again.');
+                    var formData = new FormData(form);
+                    formData.append('action', 'acme_form_submit');
+
+                    // Use relative URL to avoid CORS/Mixed Content issues
+                    fetch('/wp-admin/admin-ajax.php', {
+                        method: 'POST',
+                        body: formData
+                    })
+                    .then(function (res) { 
+                        if (!res.ok) {
+                            return res.text().then(function(text) {
+                                throw new Error(text || 'Server error ' + res.status);
+                            });
+                        }
+                        return res.json(); 
+                    })
+                    .then(function (response) {
+                        if (response.success) {
+                            alert(response.data.message || 'Form submitted successfully');
+                            form.reset();
+                        } else {
+                            alert((response.data && response.data.message) || response.message || 'Submission failed');
+                        }
+                    })
+                    .catch(function (error) {
+                        console.error('ACME Form Error:', error);
+                        alert('Request failed: ' + error.message);
+                    });
                 });
-            });
-        });
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initAcmeForm);
+            } else {
+                initAcmeForm();
+            }
+        })();
     </script>
 
     <?php
@@ -208,23 +232,28 @@ function acme_process_lead_submission($raw_data)
 
 function acme_handle_form()
 {
-    error_log('ACME FORM HIT: ' . wp_json_encode($_POST));
-
     if (empty($_POST)) {
+        error_log('ACME FORM ERROR: No data received');
         wp_send_json_error(['message' => 'No data received']);
     }
 
     // 1. Nonce verification
-    check_ajax_referer('acme_crm_form_nonce', 'acme_form_nonce');
+    $nonce = isset($_POST['acme_form_nonce']) ? $_POST['acme_form_nonce'] : '';
+    if (!wp_verify_nonce($nonce, 'acme_crm_form_nonce')) {
+        error_log('ACME FORM NONCE FAIL: Nonce: ' . $nonce);
+        wp_send_json_error(['message' => 'Security check failed'], 403);
+    }
 
     // 2. Honeypot check
-    if (isset($_POST['acme_hp_field']) && !empty($_POST['acme_hp_field'])) {
+    if (!empty($_POST['acme_hp_field'])) {
+        error_log('ACME FORM HONEYPOT HIT');
         wp_send_json_error(['message' => 'Invalid input']);
     }
 
     $result = acme_process_lead_submission($_POST);
 
     if (!$result['success']) {
+        error_log('ACME FORM PROCESSING FAIL: ' . $result['message']);
         wp_send_json_error([
             'message' => $result['message']
         ]);
