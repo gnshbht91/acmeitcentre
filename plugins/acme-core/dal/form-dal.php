@@ -1,12 +1,14 @@
 <?php
-if (!defined('ABSPATH')) exit;
+if (!defined('ABSPATH'))
+    exit;
 
 /**
  * DAL: Form Entries
  * Audited for user_id = 0 safety (Phase 9.14.1)
  */
-function acme_get_valid_statuses() {
-    return ['new','duplicate','contacted','qualified','converted','closed'];
+function acme_get_valid_statuses()
+{
+    return ['new', 'duplicate', 'contacted', 'qualified', 'converted', 'closed'];
 }
 
 
@@ -41,10 +43,17 @@ function acme_insert_form_entry(
 
     $table_name = $wpdb->prefix . 'acme_form_entries';
 
-    $users = get_users([
-        'role__in' => ['administrator', 'editor'],
-        'fields' => 'ID'
-    ]);
+    if (function_exists('acme_get_crm_assignable_users')) {
+        $users = acme_get_crm_assignable_users();
+        $users = array_map(function ($user) {
+            return (int) $user->ID;
+        }, $users);
+    } else {
+        $users = get_users([
+            'role__in' => ['administrator', 'editor'],
+            'fields' => 'ID'
+        ]);
+    }
 
     $user_id = 0; // Default to unassigned
     if (!empty($users)) {
@@ -70,16 +79,22 @@ function acme_insert_form_entry(
             'created_at' => current_time('mysql')
         ],
         [
-            '%s','%s','%s','%s',
-            '%s','%s','%s','%s',
-            '%s','%d','%s','%d',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%s',
+            '%d',
+            '%s',
+            '%d',
             '%s'
         ]
     );
 
-    if ($wpdb->last_error) {
-        error_log('ACME DB ERROR: ' . $wpdb->last_error);
-    }
 
     if ($result === false) {
         return false;
@@ -88,7 +103,8 @@ function acme_insert_form_entry(
     return $wpdb->insert_id;
 }
 
-function acme_check_duplicate($email, $phone) {
+function acme_check_duplicate($email, $phone)
+{
     if (empty($email) && empty($phone)) {
         return false;
     }
@@ -112,7 +128,8 @@ function acme_check_duplicate($email, $phone) {
 
 
 
-function acme_export_user_data($email = '', $phone = '') {
+function acme_export_user_data($email = '', $phone = '')
+{
     global $wpdb;
 
     $table = $wpdb->prefix . 'acme_form_entries';
@@ -142,7 +159,8 @@ function acme_export_user_data($email = '', $phone = '') {
     return is_array($results) ? $results : [];
 }
 
-function acme_delete_user_data($email = '', $phone = '') {
+function acme_delete_user_data($email = '', $phone = '')
+{
     global $wpdb;
 
     $table = $wpdb->prefix . 'acme_form_entries';
@@ -171,12 +189,24 @@ function acme_delete_user_data($email = '', $phone = '') {
     return $wpdb->query($query);
 }
 
-function acme_get_leads($limit = 20, $offset = 0, $status = '', $search = '', $user_id = 0) {
+function acme_get_leads($limit = 20, $offset = 0, $status = '', $search = '', $user_id = 0, $orderby = 'created_at', $order = 'desc')
+{
     $limit = max(1, intval($limit));
     $offset = max(0, intval($offset));
     $user_id = max(0, intval($user_id));
     $status = sanitize_text_field($status);
     $search = sanitize_text_field($search);
+
+    // Whitelist validation for sorting (Phase 9.22.1)
+    $allowed_orderby = ['name', 'email', 'course', 'created_at'];
+    $allowed_order = ['asc', 'desc'];
+
+    if (!in_array($orderby, $allowed_orderby)) {
+        $orderby = 'created_at';
+    }
+    if (!in_array(strtolower($order), $allowed_order)) {
+        $order = 'desc';
+    }
 
     global $wpdb;
 
@@ -184,6 +214,10 @@ function acme_get_leads($limit = 20, $offset = 0, $status = '', $search = '', $u
 
     $where = "WHERE 1=1";
     $params = [];
+
+    if (function_exists('acme_user_can_access_crm') && !acme_user_can_access_crm()) {
+        return [];
+    }
 
     // Enforcement: Non-admins can only see their own leads (Phase 9.15)
     if (!current_user_can('manage_options')) {
@@ -215,7 +249,7 @@ function acme_get_leads($limit = 20, $offset = 0, $status = '', $search = '', $u
     $params[] = $offset;
 
     $query = $wpdb->prepare(
-        "SELECT * FROM $table $where ORDER BY created_at DESC LIMIT %d OFFSET %d",
+        "SELECT * FROM $table $where ORDER BY $orderby $order LIMIT %d OFFSET %d",
         ...$params
     );
 
@@ -223,7 +257,8 @@ function acme_get_leads($limit = 20, $offset = 0, $status = '', $search = '', $u
     return is_array($results) ? $results : [];
 }
 
-function acme_get_leads_count($status = '', $search = '', $user_id = 0) {
+function acme_get_leads_count($status = '', $search = '', $user_id = 0)
+{
     $user_id = max(0, intval($user_id));
     $status = sanitize_text_field($status);
     $search = sanitize_text_field($search);
@@ -233,6 +268,10 @@ function acme_get_leads_count($status = '', $search = '', $user_id = 0) {
 
     $where = "WHERE 1=1";
     $params = [];
+
+    if (function_exists('acme_user_can_access_crm') && !acme_user_can_access_crm()) {
+        return 0;
+    }
 
     // Enforcement: Non-admins can only see their own leads (Phase 9.15)
     if (!current_user_can('manage_options')) {
@@ -267,11 +306,16 @@ function acme_get_leads_count($status = '', $search = '', $user_id = 0) {
 
     return (int) $wpdb->get_var($query);
 }
-function acme_update_lead_status($lead_id, $status) {
+function acme_update_lead_status($lead_id, $status)
+{
     $lead_id = intval($lead_id);
     $status = sanitize_text_field($status);
 
     if ($lead_id <= 0 || !in_array($status, acme_get_valid_statuses(), true)) {
+        return false;
+    }
+
+    if (function_exists('acme_user_can_access_crm') && !acme_user_can_access_crm()) {
         return false;
     }
 
@@ -296,11 +340,16 @@ function acme_update_lead_status($lead_id, $status) {
     );
 }
 
-function acme_update_lead_note($lead_id, $note) {
+function acme_update_lead_note($lead_id, $note)
+{
     $clean_lead_id = intval($lead_id);
     $clean_note = sanitize_textarea_field($note);
 
     if ($clean_lead_id <= 0) {
+        return false;
+    }
+
+    if (function_exists('acme_user_can_access_crm') && !acme_user_can_access_crm()) {
         return false;
     }
 
@@ -325,7 +374,8 @@ function acme_update_lead_note($lead_id, $note) {
     );
 }
 
-function acme_update_lead_user($lead_id, $user_id) {
+function acme_update_lead_user($lead_id, $user_id)
+{
     if (!current_user_can('manage_options')) {
         return false;
     }
@@ -358,3 +408,124 @@ function acme_update_lead_user($lead_id, $user_id) {
     );
 }
 
+/**
+ * Delete a lead by ID
+ * @param int $lead_id
+ * @return bool
+ */
+function acme_delete_lead_by_id($lead_id)
+{
+    error_log('DELETE ID: ' . $lead_id);
+
+    $lead_id = intval($lead_id);
+    if ($lead_id <= 0) {
+        return false;
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'acme_form_entries';
+
+    $deleted = $wpdb->delete(
+        $table,
+        ['id' => $lead_id],
+        ['%d']
+    );
+
+    error_log('ROWS AFFECTED: ' . $deleted);
+
+    return $deleted !== false && $deleted > 0;
+}
+
+/**
+ * Bulk delete leads by ID array
+ * @param array $lead_ids
+ * @return bool
+ */
+function acme_delete_leads_bulk($lead_ids)
+{
+    if (!is_array($lead_ids) || empty($lead_ids)) {
+        return false;
+    }
+
+    global $wpdb;
+    $table = $wpdb->prefix . 'acme_form_entries';
+
+    $clean_ids = array_map('intval', $lead_ids);
+    $clean_ids = array_filter($clean_ids, function ($id) {
+        return $id > 0; });
+
+    if (empty($clean_ids)) {
+        return false;
+    }
+
+    $placeholders = implode(',', array_fill(0, count($clean_ids), '%d'));
+    $query = $wpdb->prepare("DELETE FROM $table WHERE id IN ($placeholders)", ...$clean_ids);
+    $deleted = $wpdb->query($query);
+    
+    error_log('BULK DELETE ROWS AFFECTED: ' . $deleted);
+
+    return $deleted !== false && $deleted > 0;
+}
+
+
+function acme_update_leads_status_bulk($lead_ids, $status)
+{
+
+    global $wpdb;
+
+    // Step 1: Validate input
+    if (!is_array($lead_ids) || empty($lead_ids)) {
+        return false;
+    }
+
+    if (!is_string($status) || trim($status) === '') {
+        return false;
+    }
+
+    // Step 2: Clean status
+    $status = sanitize_text_field($status);
+
+    if (!in_array($status, acme_get_valid_statuses(), true)) {
+        return false;
+    }
+
+    // Step 3: Filter valid IDs
+    $valid_ids = array();
+
+    foreach ($lead_ids as $id) {
+        $id = intval($id);
+        if ($id > 0) {
+            $valid_ids[] = $id;
+        }
+    }
+
+    // Step 4: If no valid IDs → fail
+    if (empty($valid_ids)) {
+        return false;
+    }
+
+    // Step 5: Track success
+    $updated = 0;
+
+    foreach ($valid_ids as $id) {
+
+        $result = $wpdb->update(
+            $wpdb->prefix . 'acme_form_entries',
+            array('status' => $status),
+            array('id' => $id),
+            array('%s'),
+            array('%d')
+        );
+
+        if ($result !== false) {
+            $updated++;
+        }
+    }
+
+    // Step 6: Final validation
+    if ($updated === 0) {
+        return false;
+    }
+
+    return true;
+}

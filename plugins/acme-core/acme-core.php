@@ -22,12 +22,31 @@ if (!defined('ACME_URL')) {
     define('ACME_URL', plugin_dir_url(__FILE__));
 }
 
+function acme_user_can_access_crm($user = null)
+{
+    if ($user === null) {
+        $user = wp_get_current_user();
+    }
+
+    return user_can($user, 'manage_options') || user_can($user, 'edit_pages');
+}
+
+function acme_get_crm_assignable_users()
+{
+    $users = get_users([
+        'fields' => 'all'
+    ]);
+
+    return array_values(array_filter($users, function ($user) {
+        return acme_user_can_access_crm($user);
+    }));
+}
+
 require_once ACME_PATH . 'core/loader.php';
 
 require_once plugin_dir_path(__FILE__) . 'dal/form-dal.php';
 require_once plugin_dir_path(__FILE__) . 'modules/module-cron.php';
 
-register_activation_hook(__FILE__, 'acme_create_form_table');
 
 
 
@@ -98,10 +117,11 @@ function acme_create_tables()
 
     require_once ABSPATH . 'wp-admin/includes/upgrade.php';
 
-    dbDelta(acme_get_leads_table_sql());
     dbDelta(acme_get_logs_table_sql());
     dbDelta(acme_get_audit_table_sql());
-    return false;
+    if (function_exists('acme_create_form_table')) {
+        acme_create_form_table();
+    }
 }
 
 function acme_plugin_activate()
@@ -152,13 +172,14 @@ function acme_check_db_version()
         $tables = array(
             $wpdb->prefix . 'acme_leads',
             $wpdb->prefix . 'acme_logs',
-            $wpdb->prefix . 'acme_audit'
+            $wpdb->prefix . 'acme_audit',
+            $wpdb->prefix . 'acme_form_entries'
         );
 
         $all_tables_exist = true;
 
         foreach ($tables as $table) {
-            $result = $wpdb->get_var("SHOW TABLES LIKE '{$table}'");
+            $result = $wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table));
             if ($result !== $table) {
                 $all_tables_exist = false;
                 break;
@@ -183,7 +204,8 @@ function acme_check_db_version()
 
 add_action('admin_init', 'acme_check_db_version');
 
-function acme_schedule_cleanup() {
+function acme_schedule_cleanup()
+{
     if (!wp_next_scheduled('acme_cleanup_cron')) {
         wp_schedule_event(time(), 'daily', 'acme_cleanup_cron');
     }
@@ -192,7 +214,8 @@ function acme_schedule_cleanup() {
 add_action('wp', 'acme_schedule_cleanup');
 
 
-function acme_clear_cleanup_cron() {
+function acme_clear_cleanup_cron()
+{
     wp_clear_scheduled_hook('acme_cleanup_cron');
     return false;
 }
@@ -219,11 +242,31 @@ add_action('wp_ajax_nopriv_acme_form_submit', 'acme_handle_form');
  */
 add_action('admin_menu', 'acme_crm_menu');
 
-function acme_crm_menu() {
+/**
+ * Enqueue jQuery on the frontend (required by form scripts)
+ */
+add_action('wp_enqueue_scripts', function () {
+    wp_enqueue_script('jquery');
+});
+
+/**
+ * Enqueue scripts for CRM page
+ */
+add_action('admin_enqueue_scripts', function ($hook) {
+    if ($hook === 'toplevel_page_acme-crm') {
+        wp_enqueue_script('acme-admin-script', ACME_URL . 'assets/js/admin.js', array('jquery'), ACME_VERSION, true);
+        wp_localize_script('acme-admin-script', 'acme_admin', [
+            'nonce' => wp_create_nonce('acme_crm_ajax_nonce')
+        ]);
+    }
+});
+
+function acme_crm_menu()
+{
     add_menu_page(
         'ACME CRM',
         'ACME CRM',
-        'read',
+        'edit_pages',
         'acme-crm',
         'acme_crm_page',
         'dashicons-groups',
@@ -236,14 +279,17 @@ function acme_crm_menu() {
  * CRM Page Handler
  * Restored to acme-core.php (Phase 9.14.1)
  */
-function acme_crm_page() {
-    if (!current_user_can('read')) {
+function acme_crm_page()
+{
+    if (!acme_user_can_access_crm()) {
         wp_die('Unauthorized');
     }
 
     // Handle Status Update
-    if (isset($_POST['lead_id'], $_POST['status'], $_POST['_wpnonce']) &&
-        wp_verify_nonce($_POST['_wpnonce'], 'acme_update_status_nonce')) {
+    if (
+        isset($_POST['lead_id'], $_POST['status'], $_POST['_wpnonce']) &&
+        wp_verify_nonce($_POST['_wpnonce'], 'acme_crm_status_nonce')
+    ) {
 
         $clean_lead_id = intval($_POST['lead_id']);
         $clean_status = sanitize_text_field($_POST['status']);
@@ -257,8 +303,10 @@ function acme_crm_page() {
     }
 
     // Handle Note Update
-    if (isset($_POST['note'], $_POST['lead_id'], $_POST['_wpnonce']) &&
-        wp_verify_nonce($_POST['_wpnonce'], 'acme_note_nonce')) {
+    if (
+        isset($_POST['note'], $_POST['lead_id'], $_POST['_wpnonce']) &&
+        wp_verify_nonce($_POST['_wpnonce'], 'acme_crm_note_nonce')
+    ) {
 
         $clean_lead_id = intval($_POST['lead_id']);
         $clean_note = sanitize_textarea_field($_POST['note']);
@@ -269,8 +317,10 @@ function acme_crm_page() {
     }
 
     // Handle Assignment Update (Validated)
-    if (isset($_POST['lead_id'], $_POST['user_id'], $_POST['_wpnonce']) &&
-        wp_verify_nonce($_POST['_wpnonce'], 'acme_assign_nonce')) {
+    if (
+        isset($_POST['lead_id'], $_POST['user_id'], $_POST['_wpnonce']) &&
+        wp_verify_nonce($_POST['_wpnonce'], 'acme_crm_assign_nonce')
+    ) {
 
         $clean_lead_id = intval($_POST['lead_id']);
         $clean_user_id = intval($_POST['user_id']);
@@ -308,9 +358,29 @@ function acme_crm_page() {
     $total = acme_get_leads_count($clean_status, $clean_search, $view_user_id);
     $total_pages = max(1, ceil($total / $limit));
 
-    $leads = acme_get_leads($limit, $offset, $clean_status, $clean_search, $view_user_id);
+    $allowed_orderby = ['name', 'email', 'course', 'created_at'];
+    $allowed_order = ['asc', 'desc'];
 
-    $users = get_users(['fields' => ['ID', 'display_name']]);
+    $order_by = 'created_at';
+    $order = 'desc';
+
+    if (isset($_GET['orderby'])) {
+        $temp = strtolower($_GET['orderby']);
+        if (in_array($temp, $allowed_orderby)) {
+            $order_by = $temp;
+        }
+    }
+
+    if (isset($_GET['order'])) {
+        $temp_order = strtolower($_GET['order']);
+        if (in_array($temp_order, $allowed_order)) {
+            $order = $temp_order;
+        }
+    }
+
+    $leads = acme_get_leads($limit, $offset, $clean_status, $clean_search, $view_user_id, $order_by, $order);
+
+    $users = acme_get_crm_assignable_users();
 
     echo '<div class="wrap">';
     echo '<h1>ACME CRM</h1>';
@@ -332,17 +402,49 @@ function acme_crm_page() {
     echo '<button class="button">Filter</button>';
     echo '</form>';
 
-    echo '<table class="widefat fixed striped">';
+    if ($is_admin) {
+        echo '<button id="acme-bulk-delete-btn">Delete Selected</button>';
+        echo ' | ';
+    }
+    echo '<input type="text" id="acme-search" placeholder="Search by name or email">';
+    echo '<select id="acme-filter-status" style="margin-left: 10px; vertical-align: middle;">';
+    echo '<option value="">All Statuses</option>';
+    foreach (acme_get_valid_statuses() as $status) {
+        echo '<option value="' . esc_attr($status) . '">' . esc_html(ucfirst($status)) . '</option>';
+    }
+    echo '</select>';
+    echo '<button id="acme-export-csv" class="button" style="margin-left: 10px;">Export CSV</button>';
+    echo '<span id="acme-search-empty" style="display:none; color:red; margin-left:10px;">No results found in current view</span>';
+
+    ?>
+    <?php if ($is_admin): ?>
+        <select id="acme-bulk-status">
+            <option value="">Select Status</option>
+            <?php foreach (acme_get_valid_statuses() as $status): ?>
+                <option value="<?php echo esc_attr($status); ?>">
+                    <?php echo esc_html(ucfirst($status)); ?>
+                </option>
+            <?php endforeach; ?>
+        </select>
+
+        <button id="acme-bulk-status-btn">Update Status</button>
+    <?php endif; ?>
+    <?php
+    echo '<table id="acme-leads-table" class="widefat fixed striped">';
     echo '<thead><tr>
+        <th>
+            <input type="checkbox" id="acme-select-all">
+        </th>
         <th>ID</th>
-        <th>Name</th>
+        <th><a href="' . esc_url(add_query_arg(['orderby' => 'name', 'order' => ($order_by === 'name' && $order === 'asc' ? 'desc' : 'asc')])) . '">Name</a></th>
         <th>Phone</th>
-        <th>Email</th>
-        <th>Course</th>
+        <th><a href="' . esc_url(add_query_arg(['orderby' => 'email', 'order' => ($order_by === 'email' && $order === 'asc' ? 'desc' : 'asc')])) . '">Email</a></th>
+        <th><a href="' . esc_url(add_query_arg(['orderby' => 'course', 'order' => ($order_by === 'course' && $order === 'asc' ? 'desc' : 'asc')])) . '">Course</a></th>
         <th>Status</th>
         <th>Note</th>
         ' . ($is_admin ? '<th>Assign</th>' : '') . '
-        <th>Date</th>
+        <th><a href="' . esc_url(add_query_arg(['orderby' => 'created_at', 'order' => ($order_by === 'created_at' && $order === 'asc' ? 'desc' : 'asc')])) . '">Date</a></th>
+        ' . ($is_admin ? '<th>Actions</th>' : '') . '
     </tr></thead>';
 
     echo '<tbody>';
@@ -350,6 +452,11 @@ function acme_crm_page() {
     if (!empty($leads)) {
         foreach ($leads as $lead) {
             echo '<tr>';
+            ?>
+            <td>
+                <input type="checkbox" class="acme-select-row" value="<?php echo esc_attr($lead['id']); ?>">
+            </td>
+            <?php
             echo '<td>' . esc_html($lead['id']) . '</td>';
             echo '<td>' . esc_html($lead['name']) . '</td>';
             echo '<td>' . esc_html($lead['phone']) . '</td>';
@@ -357,7 +464,7 @@ function acme_crm_page() {
             echo '<td>' . esc_html($lead['course']) . '</td>';
             echo '<td>';
             echo '<form method="POST">';
-            wp_nonce_field('acme_update_status_nonce');
+            wp_nonce_field('acme_crm_status_nonce');
 
             echo '<input type="hidden" name="lead_id" value="' . esc_attr($lead['id']) . '">';
 
@@ -375,7 +482,7 @@ function acme_crm_page() {
 
             echo '<td>';
             echo '<form method="POST">';
-            wp_nonce_field('acme_note_nonce');
+            wp_nonce_field('acme_crm_note_nonce');
 
             echo '<input type="hidden" name="lead_id" value="' . esc_attr($lead['id']) . '">';
 
@@ -389,7 +496,7 @@ function acme_crm_page() {
             if ($is_admin) {
                 echo '<td>';
                 echo '<form method="POST">';
-                wp_nonce_field('acme_assign_nonce');
+                wp_nonce_field('acme_crm_assign_nonce');
 
                 echo '<input type="hidden" name="lead_id" value="' . esc_attr($lead['id']) . '">';
 
@@ -407,10 +514,13 @@ function acme_crm_page() {
             }
 
             echo '<td>' . esc_html($lead['created_at']) . '</td>';
+            if ($is_admin) {
+                echo '<td><button class="acme-delete-btn button" data-id="' . esc_attr($lead['id']) . '">Delete</button></td>';
+            }
             echo '</tr>';
         }
     } else {
-        echo '<tr><td colspan="' . ($is_admin ? 9 : 8) . '">No leads found</td></tr>';
+        echo '<tr><td colspan="' . ($is_admin ? 10 : 8) . '">No leads found</td></tr>';
     }
 
     echo '</tbody>';
@@ -439,6 +549,7 @@ function acme_crm_page() {
     }
 
     echo '</div></div>';
+
 
     echo '</div>';
     return false;

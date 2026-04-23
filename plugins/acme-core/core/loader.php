@@ -1,7 +1,7 @@
 <?php
 if (!defined('ABSPATH')) exit;
 
-require_once ACME_PATH . 'modules/module-course-engine.php';
+
 require_once ACME_PATH . 'modules/module-form.php';
 
 // Frontend

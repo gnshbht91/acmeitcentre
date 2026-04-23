@@ -4,7 +4,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function acme_register_batch_cpt() {
+function acme_register_batch_cpt()
+{
 
     $labels = array(
         'name' => 'Batches',
@@ -38,7 +39,8 @@ add_action('init', 'acme_register_batch_cpt');
 /**
  * Add Meta Box for Batch Details
  */
-function acme_add_batch_meta_box() {
+function acme_add_batch_meta_box()
+{
     add_meta_box(
         'acme_batch_fields',
         'Batch Details',
@@ -53,7 +55,8 @@ add_action('add_meta_boxes', 'acme_add_batch_meta_box');
 /**
  * Render Meta Box UI
  */
-function acme_render_batch_meta_box($post) {
+function acme_render_batch_meta_box($post)
+{
     // Add Nonce
     wp_nonce_field('acme_batch_nonce', 'acme_batch_nonce');
 
@@ -88,19 +91,22 @@ function acme_render_batch_meta_box($post) {
         <tr>
             <th><label for="acme_batch_start_date">Start Date</label></th>
             <td>
-                <input type="date" name="acme_batch_start_date" id="acme_batch_start_date" value="<?php echo esc_attr($start_date); ?>" required class="regular-text">
+                <input type="date" name="acme_batch_start_date" id="acme_batch_start_date"
+                    value="<?php echo esc_attr($start_date); ?>" required class="regular-text">
             </td>
         </tr>
         <tr>
             <th><label for="acme_batch_duration">Duration (Months)</label></th>
             <td>
-                <input type="number" name="acme_batch_duration" id="acme_batch_duration" value="<?php echo esc_attr($duration); ?>" min="1" required class="regular-text">
+                <input type="number" name="acme_batch_duration" id="acme_batch_duration"
+                    value="<?php echo esc_attr($duration); ?>" min="1" required class="regular-text">
             </td>
         </tr>
         <tr>
             <th><label for="acme_batch_seats">Total Seats</label></th>
             <td>
-                <input type="number" name="acme_batch_seats" id="acme_batch_seats" value="<?php echo esc_attr($seats); ?>" min="1" required class="regular-text">
+                <input type="number" name="acme_batch_seats" id="acme_batch_seats" value="<?php echo esc_attr($seats); ?>"
+                    min="1" required class="regular-text">
             </td>
         </tr>
         <tr>
@@ -120,7 +126,8 @@ function acme_render_batch_meta_box($post) {
 /**
  * Save Meta Box Data
  */
-function acme_save_batch_meta($post_id) {
+function acme_save_batch_meta($post_id)
+{
     // Security Checks
     if (!isset($_POST['acme_batch_nonce'])) {
         return;

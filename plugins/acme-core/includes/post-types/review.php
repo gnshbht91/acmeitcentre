@@ -4,7 +4,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function acme_register_review_cpt() {
+function acme_register_review_cpt()
+{
 
     $labels = array(
         'name' => 'Reviews',
@@ -38,7 +39,8 @@ add_action('init', 'acme_register_review_cpt');
 /**
  * Step 1: Add Meta Box
  */
-function acme_add_review_meta_box() {
+function acme_add_review_meta_box()
+{
     add_meta_box(
         'acme_review_fields',
         esc_html__('Testimonial Details', 'acme-core'),
@@ -53,28 +55,33 @@ add_action('add_meta_boxes', 'acme_add_review_meta_box');
 /**
  * Step 2 & 3: Render Meta Box UI & Nonce
  */
-function acme_render_review_meta_box($post) {
+function acme_render_review_meta_box($post)
+{
     // Step 3: Nonce field
     wp_nonce_field('acme_review_nonce', 'acme_review_nonce');
 
     // Retrieve existing values
     $client_name = get_post_meta($post->ID, '_review_client_name', true);
-    $rating      = get_post_meta($post->ID, '_review_rating', true);
+    $rating = get_post_meta($post->ID, '_review_rating', true);
     $review_text = get_post_meta($post->ID, '_review_text', true);
 
     ?>
     <div class="acme-meta-box">
         <p>
-            <label for="acme_review_client_name"><strong><?php esc_html_e('Client Name', 'acme-core'); ?></strong></label><br>
-            <input type="text" id="acme_review_client_name" name="acme_review_client_name" value="<?php echo esc_attr($client_name); ?>" class="widefat" required>
+            <label
+                for="acme_review_client_name"><strong><?php esc_html_e('Client Name', 'acme-core'); ?></strong></label><br>
+            <input type="text" id="acme_review_client_name" name="acme_review_client_name"
+                value="<?php echo esc_attr($client_name); ?>" class="widefat" required>
         </p>
         <p>
             <label for="acme_review_rating"><strong><?php esc_html_e('Rating (1-5)', 'acme-core'); ?></strong></label><br>
-            <input type="number" id="acme_review_rating" name="acme_review_rating" value="<?php echo esc_attr($rating); ?>" min="1" max="5" class="widefat" required>
+            <input type="number" id="acme_review_rating" name="acme_review_rating" value="<?php echo esc_attr($rating); ?>"
+                min="1" max="5" class="widefat" required>
         </p>
         <p>
             <label for="acme_review_text"><strong><?php esc_html_e('Review Text', 'acme-core'); ?></strong></label><br>
-            <textarea id="acme_review_text" name="acme_review_text" rows="5" class="widefat" required><?php echo esc_textarea($review_text); ?></textarea>
+            <textarea id="acme_review_text" name="acme_review_text" rows="5" class="widefat"
+                required><?php echo esc_textarea($review_text); ?></textarea>
         </p>
     </div>
     <?php
@@ -83,7 +90,8 @@ function acme_render_review_meta_box($post) {
 /**
  * Step 4-9: Save Meta Data
  */
-function acme_save_review_meta($post_id) {
+function acme_save_review_meta($post_id)
+{
     if (get_post_type($post_id) !== 'review') {
         return;
     }

@@ -75,7 +75,7 @@ class ACME_DAL {
             $limit = 20;
         }
 
-        $table = $wpdb->prefix . 'acme_leads';
+        $table = $wpdb->prefix . 'acme_form_entries';
 
         // Check table exists
         $table_exists = $wpdb->get_var("SHOW TABLES LIKE '{$table}'");

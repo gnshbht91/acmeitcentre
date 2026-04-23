@@ -4,7 +4,8 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-function acme_register_course_cpt() {
+function acme_register_course_cpt()
+{
 
     $labels = array(
         'name' => 'Courses',
@@ -38,7 +39,8 @@ add_action('init', 'acme_register_course_cpt');
 /**
  * Add Meta Box for Course Details
  */
-function acme_add_course_meta_box() {
+function acme_add_course_meta_box()
+{
     add_meta_box(
         'acme_course_fields',
         'Course Details',
@@ -53,7 +55,8 @@ add_action('add_meta_boxes', 'acme_add_course_meta_box');
 /**
  * Render Meta Box Content
  */
-function acme_render_course_meta_box($post) {
+function acme_render_course_meta_box($post)
+{
     // Add Nonce
     wp_nonce_field('acme_course_meta_nonce', 'acme_course_nonce');
 
@@ -70,13 +73,15 @@ function acme_render_course_meta_box($post) {
             <th><label for="course_price">Price (₹)</label></th>
             <td>
                 <span>₹ </span>
-                <input type="number" id="course_price" name="course_price" value="<?php echo esc_attr($price); ?>" min="0" required placeholder="Enter price" class="regular-text">
+                <input type="number" id="course_price" name="course_price" value="<?php echo esc_attr($price); ?>" min="0"
+                    required placeholder="Enter price" class="regular-text">
             </td>
         </tr>
         <tr>
             <th><label for="course_duration">Duration</label></th>
             <td>
-                <input type="number" id="course_duration" name="course_duration" value="<?php echo esc_attr($duration); ?>" min="1" required class="small-text">
+                <input type="number" id="course_duration" name="course_duration" value="<?php echo esc_attr($duration); ?>"
+                    min="1" required class="small-text">
                 <select id="course_duration_unit" name="course_duration_unit" required>
                     <option value="">Select Unit</option>
                     <option value="Hours" <?php selected($duration_unit, 'Hours'); ?>>Hours</option>
@@ -113,7 +118,8 @@ function acme_render_course_meta_box($post) {
 /**
  * Save Course Meta Data
  */
-function acme_save_course_meta($post_id) {
+function acme_save_course_meta($post_id)
+{
     // Post type check
     if (get_post_type($post_id) !== 'course') {
         return;
@@ -151,7 +157,8 @@ function acme_save_course_meta($post_id) {
     // Duration Unit Validation
     if (isset($_POST['course_duration_unit'])) {
         $duration_unit = sanitize_text_field($_POST['course_duration_unit']);
-        if (!empty($duration_unit)) {
+        $valid_units = ['Hours', 'Days', 'Months'];
+        if (in_array($duration_unit, $valid_units, true)) {
             update_post_meta($post_id, '_course_duration_unit', $duration_unit);
         }
     }
@@ -159,7 +166,8 @@ function acme_save_course_meta($post_id) {
     // Level Validation
     if (isset($_POST['course_level'])) {
         $level = sanitize_text_field($_POST['course_level']);
-        if (!empty($level)) {
+        $valid_levels = ['Beginner', 'Intermediate', 'Advanced'];
+        if (in_array($level, $valid_levels, true)) {
             update_post_meta($post_id, '_course_level', $level);
         }
     }
@@ -167,7 +175,8 @@ function acme_save_course_meta($post_id) {
     // Mode Validation
     if (isset($_POST['course_mode'])) {
         $mode = sanitize_text_field($_POST['course_mode']);
-        if (!empty($mode)) {
+        $valid_modes = ['Online', 'Offline'];
+        if (in_array($mode, $valid_modes, true)) {
             update_post_meta($post_id, '_course_mode', $mode);
         }
     }
