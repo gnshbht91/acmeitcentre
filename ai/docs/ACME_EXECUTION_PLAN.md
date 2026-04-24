@@ -18,9 +18,9 @@ EXECUTION: ONE TASK ONLY
 
 # 🧭 SYSTEM STATE
 
-CURRENT PHASE: 5
-CURRENT TASK: 5.4 Get batches
-LAST COMPLETED: 5.3 Get course
+CURRENT PHASE: 8
+CURRENT TASK: 8.1 Upgrade insert (lead-ready)
+LAST COMPLETED: 7.5 Data Handling
 
 ---
 
@@ -106,7 +106,7 @@ ALL TASKS MUST FOLLOW:
 3.2 Create admin menu
 3.3 Create settings UI
 3.4 Add contact fields
-3.5 Add WhatsApp settings ← CURRENT
+3.5 Add WhatsApp settings
 3.6 Add social fields
 3.6.1 HARDEN_SAVE_LOGIC
 3.6.2 STRICT_INPUT_CHECK
@@ -195,34 +195,47 @@ NO EXTRA FILE ACCESS
 
 ## PHASE 7 — FORM SYSTEM
 
-7.1 Create form
+7.1 Create form 
 7.2 Add nonce
+7.2.1-NONCE-VERIFY-FIX 
 7.3 Add honeypot
+7.3.1 HONEYPOT ← CURRENT
+7.3.2-CLEANUP-BACKUP
 7.4 AJAX handler
-7.5 Validate input
-7.6 Sanitize input
-7.7 Rate limit
-7.8 Insert DB
-7.9 Transaction
-7.10 JSON response
-7.11 JS
-7.12 Verify
+7.4.2-SECURITY-CHECK
+7.4.3-DATA-SANITIZE
+7.4.4-RESPONSE-STRUCTURE
+
+---
+
+## PHASE 7.5 — DATA HANDLING (DB + EMAIL)
+
+| Step  | What             |
+| ----- | ---------------- |
+| 7.5.1 | Create DB table  |
+| 7.5.2 | Insert data      |
+| 7.5.3 | Return response  |
+| 7.5.4 | Email (optional) |
+ 7.5.5  SECURITY FIX
+ 
 
 ---
 
 ## PHASE 8 — LEADS
 
-8.1 Insert lead
-8.2 Capture URL
-8.3 Capture UTM
-8.4 Capture IP
-8.5 Duplicate check
-8.6 Parent lead
-8.7 Status
-8.8 Cleanup cron
-8.9 GDPR export
-8.10 GDPR erase
-8.11 Verify
+| Step  | What                         |
+|------|------------------------------|
+| 8.1  | Upgrade insert (lead-ready)  |
+| 8.2  | Capture URL                  |
+| 8.3  | Capture UTM                  |
+| 8.4  | Capture IP                   |
+| 8.5  | Duplicate check              |
+| 8.6  | Parent lead                  |
+| 8.7  | Status                       |
+| 8.8  | Cleanup cron                 |
+| 8.9  | GDPR export                  |
+| 8.10 | GDPR erase                   |
+| 8.11 | Verify                       |
 
 ---
 

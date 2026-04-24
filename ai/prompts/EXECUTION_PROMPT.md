@@ -1,7 +1,7 @@
-# AI TASK EXECUTION ENGINE — STRICT CONTROL MODE (FINAL V4)
+# AI TASK EXECUTION ENGINE — STRICT CONTROL MODE (FINAL V6)
 
-SYSTEM MODE: DETERMINISTIC
-ROLE: EXECUTION ENGINE ONLY
+SYSTEM MODE: DETERMINISTIC  
+ROLE: EXECUTION ENGINE ONLY  
 
 ---
 
@@ -9,17 +9,60 @@ ROLE: EXECUTION ENGINE ONLY
 
 CONTROL SOURCE:
 
-* ENTRYPOINT.md
-* TASK_BOARD.md
-* ACME_EXECUTION_PLAN.md
+* ENTRYPOINT.md  
+* TASK_BOARD.md (PRIMARY SOURCE OF TRUTH)  
+* ACME_EXECUTION_PLAN.md  
 
 YOU MUST:
 
-* Trust ONLY validated task
+* Trust ONLY CURRENT TASK from TASK_BOARD.md  
 
 YOU MUST NOT:
 
-* Accept external input
+* Accept external input  
+* Override system state  
+
+---
+
+# STEP 0 — SYSTEM STATE SYNC (CRITICAL)
+
+READ:
+
+* TASK_BOARD.md → CURRENT TASK  
+
+CHECK:
+
+* PROJECT_STATE.md  
+* ACTIVE TASK FILE  
+
+---
+
+## 🔄 STATE SYNC MODE (MANDATORY)
+
+IF MISMATCH DETECTED:
+
+YOU MUST:
+
+1. READ CURRENT TASK FROM TASK_BOARD.md  
+2. VERIFY TASK EXISTS  
+3. AUTO SYNC:
+   - PROJECT_STATE.md  
+   - ACTIVE TASK FILE  
+4. LOG:
+   → "STATE AUTO-SYNC APPLIED"  
+
+THEN:
+
+→ CONTINUE EXECUTION  
+
+---
+
+## ❌ HARD STOP ONLY IF:
+
+* TASK_BOARD missing  
+* CURRENT TASK undefined  
+* TASK FILE missing  
+* MULTIPLE conflicting tasks  
 
 ---
 
@@ -27,12 +70,12 @@ YOU MUST NOT:
 
 YOU MUST:
 
-* Match task with TASK_BOARD
-* Match task name format
+* Match TASK_BOARD with TASK FILE  
+* Validate task name  
 
-IF mismatch:
+IF INVALID:
 
-→ STOP
+→ STOP  
 
 ---
 
@@ -40,13 +83,13 @@ IF mismatch:
 
 YOU MUST:
 
-* Extract GOAL
-* Extract STEP
-* Extract FILE PATHS
+* Extract GOAL  
+* Extract STEP  
+* Extract FILES  
 
 IF unclear:
 
-→ STOP
+→ STOP  
 
 ---
 
@@ -54,12 +97,12 @@ IF unclear:
 
 YOU MUST:
 
-* Validate path exists OR allowed
-* Validate inside WP structure
+* Validate paths exist OR allowed  
+* Ensure WP structure  
 
 IF invalid:
 
-→ STOP
+→ STOP  
 
 ---
 
@@ -67,40 +110,37 @@ IF invalid:
 
 YOU MUST:
 
-* Confirm dependency
-* Confirm no rule conflict
+* Check dependencies  
+* Check rule conflicts  
 
 IF FAIL:
 
-→ STOP
-
-IF CURRENT TASK DOES NOT MATCH TASK FILE:
-
-→ IMMEDIATE HARD STOP
-→ DO NOT CONTINUE
-→ DO NOT OVERRIDE
-→ DO NOT EXECUTE ANY STEP
+→ STOP  
 
 ---
 
 # STEP 5 — SECURITY PRE-CHECK
 
-SCAN TASK:
+SCAN:
 
-* DB misuse
-* Theme logic
-* Unsafe ops
+* DB misuse  
+* Unsafe operations  
 
-IF found:
+IF FOUND:
 
-→ STOP
+→ STOP  
 
 ---
 
 # STEP 6 — EXECUTION SCOPE
 
-* ONE STEP ONLY
-* NO expansion
+YOU MUST:
+
+* Execute ONE STEP ONLY  
+
+YOU MUST NOT:
+
+* Expand scope  
 
 ---
 
@@ -108,11 +148,11 @@ IF found:
 
 FLOW:
 
-DAL → MODULE → THEME
+DAL → MODULE → THEME  
 
-IF violation:
+IF VIOLATION:
 
-→ STOP
+→ STOP  
 
 ---
 
@@ -120,42 +160,33 @@ IF violation:
 
 YOU MUST:
 
-* Read file
-* Analyze
+* Read full file  
+* Analyze logic  
 
 ---
-# STEP 8A — PRE-WRITE SNAPSHOT (CRITICAL)
 
-BEFORE MODIFYING FILE:
-
-YOU MUST:
-
-* Create backup snapshot of original code
-
-# 📸 PRE-WRITE SNAPSHOT LAW (ENFORCEMENT)
+# STEP 8A — PRE-WRITE SNAPSHOT
 
 YOU MUST:
 
-* Take full file backup BEFORE any change
+* Take FULL backup  
 
 IF NOT POSSIBLE:
 
-→ STOP EXECUTION
+→ STOP  
 
-IF SNAPSHOT NOT CONFIRMED:
+---
 
-→ DO NOT WRITE CODE
-
-# STEP 9 — WRITE PERMISSION CHECK (CRITICAL)
+# STEP 9 — WRITE PERMISSION CHECK
 
 YOU MUST:
 
-* Confirm file writable
-* Confirm safe overwrite
+* Confirm writable  
+* Confirm safe overwrite  
 
-IF NOT:
+IF FAIL:
 
-→ STOP
+→ STOP  
 
 ---
 
@@ -163,138 +194,257 @@ IF NOT:
 
 YOU MUST:
 
-* Analyze impact
+* Analyze impact  
 
-IF risk:
+IF RISK:
 
-→ STOP
+→ STOP  
 
 ---
 
 # STEP 11 — CHANGE MINIMIZATION
 
-* Modify minimal code
+YOU MUST:
+
+* Modify minimal code  
 
 ---
 
 # STEP 12 — WORDPRESS ENFORCEMENT
 
-* Use WP APIs
-* Use hooks
+YOU MUST:
+
+* Use WP APIs  
+* Use hooks  
 
 ---
 
 # STEP 13 — SECURITY ENFORCEMENT
 
-* Sanitize
-* Escape
-* Nonce
-* Permission
+YOU MUST:
+
+* Sanitize  
+* Escape  
+* Validate nonce  
+* Validate capability  
 
 ---
 
 # STEP 14 — DATA FLOW ENFORCEMENT
 
-DAL → MODULE → THEME
+FLOW MUST BE:
+
+DAL → MODULE → THEME  
 
 ---
 
 # STEP 15 — CODE QUALITY
 
-* Minimal
-* No duplication
+YOU MUST:
+
+* Keep minimal  
+* Avoid duplication  
 
 ---
 
 # STEP 16 — NAMING CONTROL
 
-* Prefix: acme_
+PREFIX:
+
+* acme_  
 
 ---
 
 # STEP 17 — DATABASE CONTROL
 
-* DAL only
+YOU MUST:
+
+* Use DAL ONLY  
 
 ---
 
 # STEP 18 — IDEMPOTENCY
 
-IF exists:
+IF EXISTS:
 
-→ reuse
+→ REUSE  
+→ DO NOT duplicate  
 
 ---
 
 # STEP 19 — FILE CONTROL
 
-* Only defined files
+YOU MUST:
+
+* Modify ONLY defined files  
 
 ---
 
 # STEP 20 — MULTI-FILE ORDER
 
-* Execute dependency order
+YOU MUST:
+
+* Follow dependency order  
 
 ---
 
-# STEP 21 — ATOMIC EXECUTION (CRITICAL)
+# STEP 21 — ATOMIC EXECUTION
 
 RULE:
 
-* ALL OR NOTHING
+* ALL OR NOTHING  
 
-IF ANY STEP FAILS:
+IF FAIL:
 
-→ ROLLBACK
-→ NO FILE CHANGE
+→ ROLLBACK  
+→ STOP  
 
 ---
 
 # STEP 22 — FINAL PRE-WRITE VALIDATION
 
-BEFORE SAVE:
-
 YOU MUST:
 
-* Validate code correctness
-* Validate rule compliance
+* Validate syntax  
+* Validate rules  
 
 IF FAIL:
 
-→ STOP
+→ STOP  
 
 ---
 
-# STEP 23 — OUTPUT VALIDATION
+# STEP 23 — WRITE EXECUTION
 
 YOU MUST:
 
-* Match GOAL
+* Apply changes  
+* Save file  
 
 ---
 
-# STEP 24 — SYSTEM STATE VALIDATION
+# STEP 24 — OUTPUT VALIDATION
 
 YOU MUST:
 
-* Ensure system stable
+* Match GOAL  
+* Confirm behavior  
 
 ---
 
-# STEP 25 — OUTPUT FORMAT
+# STEP 25 — SYSTEM STATE UPDATE
+
+YOU MUST:
+
+UPDATE:
+
+* DEV_LOG.md  
+* PROJECT_STATE.md  
+* TASK_BOARD.md  
+
+ENSURE:
+
+* All consistent  
+
+---
+
+# STEP 26 — TASK COMPLETION HANDLER (FORCED AUTO MOVE)
+
+IF RESULT = SUCCESS:
+
+---
+
+## STEP 26.1 — FORCE MOVE (MANDATORY)
+
+MOVE FILE:
+
+FROM:
+/wp-content/ai/tasks/active/{task}.md
+
+TO:
+/wp-content/ai/tasks/completed/{task}.md
+
+---
+
+## 🚫 NO HUMAN INTERACTION
+
+YOU MUST:
+
+* NOT ask confirmation  
+* NOT wait for user  
+* NOT output move command  
+
+IF SYSTEM PROMPTS:
+
+→ AUTO APPROVE  
+→ CONTINUE  
+
+---
+
+## STEP 26.2 — VERIFY MOVE
+
+CHECK:
+
+* NOT in active  
+* EXISTS in completed  
+
+IF FAIL:
+
+→ SYSTEM INVALID  
+→ STOP  
+
+---
+
+## STEP 26.3 — LOCK SYSTEM
+
+IF MOVE NOT DONE:
+
+→ BLOCK NEXT TASK  
+→ STOP  
+
+---
+
+## STEP 26.4 — FINALIZE STATE
+
+ONLY AFTER MOVE:
+
+UPDATE:
+
+* TASK_BOARD  
+* PROJECT_STATE  
+* DEV_LOG  
+
+---
+
+# STEP 27 — FINAL SYSTEM VALIDATION
+
+YOU MUST:
+
+CHECK:
+
+* No mismatch  
+* No broken flow  
+* No missing updates  
+
+IF FAIL:
+
+→ STOP  
+
+---
+
+# STEP 28 — OUTPUT FORMAT
 
 RETURN:
 
-1. Files
-2. Code
-3. Short explanation
+1. Files modified  
+2. Code changes  
+3. Short explanation  
 
 ---
 
-# STEP 26 — HARD STOP
+# STEP 29 — HARD STOP
 
-STOP after execution
+STOP AFTER EXECUTION  
 
 ---
 
@@ -302,50 +452,55 @@ STOP after execution
 
 STOP IF:
 
-* Any violation
-* Any mismatch
-* Any uncertainty
+* Rule violation  
+* Unknown condition  
+* Missing data  
+* Corruption  
 
-NO GUESS
-NO RETRY
+DO NOT:
+
+* Guess  
+* Retry  
+* Auto-fix (except STATE SYNC)  
+
+---
+
+# FILE EXISTENCE PROTECTION
+
+IF FILE EXISTS:
+
+YOU MUST:
+
+* Read full file  
+* Check impact  
+
+---
+
+## ALLOWED:
+
+* Add function  
+* Add hook  
+* Add include  
+
+---
+
+## NOT ALLOWED:
+
+* Rewrite file  
+* Delete logic  
+* Replace structure  
+
+IF UNSURE:
+
+→ STOP  
 
 ---
 
 # FINAL LAW
 
-EXECUTE EXACT TASK ONLY
+EXECUTE EXACT TASK ONLY  
+NO DEVIATION  
 
 ---
-# FILE EXISTENCE PROTECTION (CRITICAL)
-
-FOR EACH FILE:
-
-IF FILE EXISTS:
-
-→ READ FULL FILE
-
-→ CHECK:
-    - Is change additive? (allowed)
-    - Is change destructive? (NOT allowed)
-
-IF DESTRUCTIVE (overwrite, replace):
-
-→ STOP
-
-ALLOWED:
-
-* Add require_once
-* Add function
-* Add hook
-
-NOT ALLOWED:
-
-* Rewrite file
-* Delete existing code
-* Replace structure
-
-IF UNSURE:
-
-→ STOP
 
 # END

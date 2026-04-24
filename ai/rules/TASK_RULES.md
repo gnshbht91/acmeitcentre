@@ -1,473 +1,369 @@
-# 📋 TASK RULES — EXECUTION DISCIPLINE SYSTEM (FINAL V5)
+# 📋 TASK RULES — EXECUTION CONTROL SYSTEM (FINAL V6)
 
-SYSTEM TYPE: TASK EXECUTION CONTROL
-ENFORCEMENT LEVEL: ABSOLUTE
-AUTHORITY: BELOW MASTER_RULES.md
+SYSTEM TYPE: TASK GOVERNANCE LAYER  
+CONTROL LEVEL: HIGH  
+DEPENDENCY: MASTER_RULES.md  
 
 ---
 
-# 🎯 TASK DEFINITION LAW
+# 🎯 PURPOSE
 
-TASK DEFINES:
+Defines:
 
-* WHAT to do
-* NOT how to do
+* Task lifecycle control  
+* Task validation rules  
+* Execution boundaries  
+* State management  
 
-EXECUTION RULES DEFINE:
+---
 
-* HOW to do
+# 🧠 TASK SOURCE OF TRUTH
+
+PRIMARY:
+
+* TASK_BOARD.md  
+
+SECONDARY:
+
+* PROJECT_STATE.md (mirror only)
+
+YOU MUST:
+
+* Trust ONLY TASK_BOARD.md  
 
 YOU MUST NOT:
 
-* Mix task logic with execution logic
+* Infer from PROJECT_STATE  
+* Infer from filesystem  
+* Execute undefined task  
 
 ---
 
-# 🧱 TASK STRUCTURE (MANDATORY)
+# 📌 TASK STRUCTURE REQUIREMENT
 
 EVERY TASK MUST CONTAIN:
 
-* GOAL
-* STEP
+* GOAL  
+* STEP  
+* FILES  
+* EXPECTED_OUTPUT  
+* TASK_VALIDATION  
+* DUPLICATION_CHECK  
+* PRECONDITION_CHECK  
+* STRICT_SCOPE  
+* CONSTRAINTS  
+* SUCCESS_CRITERIA  
 
-OPTIONAL:
+IF ANY MISSING:
 
-* FILE PATHS
-* EXPECTED OUTPUT
-
-IF MISSING REQUIRED FIELDS:
-
-→ STOP
-
----
-
-# 🏷️ TASK IDENTIFICATION LAW (CRITICAL)
-
-TASK FILE NAME MUST:
-
-* Match TASK_BOARD current task
-
-FORMAT:
-
-PHASE-X.X-description.md
-
-YOU MUST:
-
-* Validate file name with TASK_BOARD
-
-IF MISMATCH:
-
-→ STOP
+→ STOP  
 
 ---
 
-# 🔒 STATE LOCK RULE (CRITICAL)
-
-IF TASK_BOARD CURRENT TASK ≠ EXECUTED TASK:
-
-→ STOP EXECUTION
-→ NO EXCEPTION
-
----
-# 🔒 FILE OVERWRITE PROTECTION LAW (CRITICAL)
-
-BEFORE WRITING ANY FILE:
-
-YOU MUST:
-
-* Check if file already exists
-
-IF FILE EXISTS:
-
-→ YOU MUST NOT:
-    - Recreate file
-    - Overwrite file
-    - Replace full content
-
-→ YOU MUST:
-    - Modify only required part
-    - Preserve existing structure
-
-IF FILE IS CORE SYSTEM FILE (e.g. loader.php, main plugin file):
-
-→ FULL FILE OVERWRITE = STRICTLY FORBIDDEN
-
-IF OVERWRITE RISK DETECTED:
-
-→ STOP EXECUTION
-→ REPORT
-
-VIOLATION = CRITICAL FAILURE
-
-# 📋 TASK AUTHORITY (CRITICAL)
-
-SOURCE OF TRUTH:
-
-* TASK_BOARD.md
-
-YOU MUST:
-
-* Execute ONLY task defined in TASK_BOARD
-
-YOU MUST NOT:
-
-* Execute random task
-* Execute future task
-* Execute completed task
-
-IF MISMATCH:
-
-→ STOP
-
----
-
-# 🔢 TASK ORDER LAW (CRITICAL)
-
-YOU MUST:
-
-* Follow ACME_EXECUTION_PLAN sequence
-
-YOU MUST NOT:
-
-* Skip tasks
-* Jump phases
-* Reorder execution
-
-IF ORDER BROKEN:
-
-→ STOP
-
----
-
-# 📂 ACTIVE TASK CONTROL (CRITICAL)
-
-INSIDE:
-
-/tasks/active/
-
-YOU MUST:
-
-* Have EXACTLY ONE task file
-
-YOU MUST NOT:
-
-* Allow multiple files
-* Allow zero files
-
-IF COUNT ≠ 1:
-
-→ STOP
-
----
-
-# 🔗 TASK DEPENDENCY LAW
-
-YOU MUST:
-
-* Ensure previous task completed
-
-CHECK:
-
-* Required files exist
-* Required logic exists
-
-IF DEPENDENCY MISSING:
-
-→ STOP
-
----
-
-# 🔁 DUPLICATE EXECUTION BLOCK
-
-CHECK:
-
-/tasks/completed/
-
-YOU MUST NOT:
-
-* Re-execute completed task
-* Recreate existing output
-
-IF FOUND:
-
-→ STOP
-
----
-
-# 🧾 TASK VALIDATION LAW
+# 🔍 TASK VALIDATION LAW
 
 BEFORE EXECUTION:
 
-YOU MUST:
+YOU MUST VERIFY:
 
-* Read full task
-* Confirm clarity
+1. Task exists in `/tasks/active/`  
+2. Matches TASK_BOARD  
+3. Valid structure  
+4. Not duplicate  
 
-YOU MUST NOT:
+IF FAIL:
 
-* Execute vague instruction
-* Assume missing detail
-
-IF UNCLEAR:
-
-→ STOP
-
+→ STOP  
 
 ---
 
-# TASK FILE STRUCTURE (MANDATORY)
-
-EVERY TASK MUST INCLUDE:
-
-* GOAL
-* STEP
-* FILE PATHS (MANDATORY)
-
-IF FILE PATHS MISSING:
-
-→ STOP
-
-
-# 📁 FILE PATH VALIDATION (CRITICAL)
+# 🧱 TASK EXECUTION LAW
 
 YOU MUST:
 
-* Validate each file path in task
+* Execute ONLY CURRENT TASK  
+* Follow STEP strictly  
+* Respect STRICT_SCOPE  
+
+YOU MUST NOT:
+
+* Expand scope  
+* Modify outside FILES  
+* Add extra logic  
+
+---
+
+# 🔄 TASK STATE CONTROL
+
+TASK STATES:
+
+1. ACTIVE  
+2. COMPLETED  
+
+---
+
+# 📁 TASK DIRECTORY RULE
+
+ACTIVE:
+/wp-content/ai/tasks/active/
+
+COMPLETED:
+/wp-content/ai/tasks/completed/
+
+---
+
+# 🔁 TASK LIFECYCLE LAW (FORCED AUTOMATION)
+
+ON TASK SUCCESS:
+
+---
+
+## STEP 1 — FORCE AUTO MOVE (MANDATORY)
+
+MOVE FILE:
+
+FROM:
+/wp-content/ai/tasks/active/{task}.md
+
+TO:
+/wp-content/ai/tasks/completed/{task}.md
+
+---
+
+## 🚫 NO HUMAN INTERACTION
+
+YOU MUST:
+
+* NOT ask confirmation  
+* NOT output move command  
+* NOT wait for approval  
+
+IF SYSTEM PROMPTS:
+
+→ AUTO APPROVE  
+→ CONTINUE  
+
+---
+
+## STEP 2 — VERIFY MOVE
 
 CHECK:
 
-* Path exists OR allowed to create
-* Path belongs to WordPress structure
+* File NOT in active  
+* File EXISTS in completed  
 
-YOU MUST NOT:
+IF FAIL:
 
-* Create files in unknown locations
-
-IF INVALID PATH:
-
-→ STOP
+→ SYSTEM INVALID  
+→ STOP  
 
 ---
 
-# 📁 FILE CONTROL LAW (CRITICAL)
+## STEP 3 — LIFECYCLE LOCK
 
-YOU MUST:
+IF FILE STILL IN ACTIVE:
 
-* Modify ONLY files defined in task
-
-YOU MUST NOT:
-
-* Modify unrelated files
-* Create extra files
-* Rename files
-* Move files
-
-IF FILE NOT SPECIFIED:
-
-→ STOP
+→ TASK NOT COMPLETE  
+→ BLOCK NEXT TASK  
 
 ---
 
-# 🧠 SCOPE CONTROL LAW
+## STEP 4 — UPDATE SYSTEM FILES
 
-YOU MUST:
+UPDATE:
 
-* Execute EXACT instruction
+1. TASK_BOARD.md  
+   * Mark completed  
+   * Set NEXT TASK  
 
-YOU MUST NOT:
+2. PROJECT_STATE.md  
+   * Update CURRENT TASK  
+   * Add completed entry  
 
-* Add extra logic
-* Add improvements
-* Expand feature
+3. DEV_LOG.md  
+   * Log execution  
+   * Include files  
 
 ---
 
-# 🧩 EXISTING CODE CHECK (CRITICAL)
+## STEP 5 — STATE CONSISTENCY CHECK
 
-BEFORE WRITING CODE:
+VERIFY:
+
+* TASK_BOARD == PROJECT_STATE  
+
+IF MISMATCH:
+
+→ TRIGGER STATE SYNC MODE  
+
+---
+
+# ❌ TASK FAILURE LAW
+
+IF TASK FAILS:
 
 YOU MUST:
 
-* Check if logic already exists
+* STOP  
+* DO NOT modify system  
+* DO NOT move file  
 
-YOU MUST NOT:
+---
 
-* Duplicate logic
-* Recreate functions
+# 🔁 DUPLICATION CONTROL
+
+YOU MUST:
+
+* Check completed tasks  
 
 IF EXISTS:
 
-→ REUSE
-→ DO NOT REWRITE
+→ STOP  
 
 ---
 
-# ⚠️ SIDE EFFECT CONTROL (CRITICAL)
+# 🧩 TASK DEPENDENCY CONTROL
 
 YOU MUST:
 
-* Analyze impact of change
+* Follow order  
 
 YOU MUST NOT:
 
-* Break dependent code
-* Affect unrelated modules
+* Skip tasks  
 
-IF SIDE EFFECT RISK:
+IF dependency missing:
 
-→ STOP
+→ STOP  
 
 ---
 
-# 🛑 PARTIAL EXECUTION BLOCK (CRITICAL)
+# 🔐 STRICT SCOPE ENFORCEMENT
 
 YOU MUST:
 
-* Complete FULL task step
+* Follow STRICT_SCOPE  
 
 YOU MUST NOT:
 
-* Leave half implementation
+* Refactor  
+* Improve  
+* Change architecture  
 
-IF TASK FAILS MIDWAY:
+IF VIOLATION:
 
-→ ABORT
-→ DO NOT SAVE PARTIAL STATE
+→ STOP  
 
 ---
 
-# 🔐 RULE COMPLIANCE CHECK
+# 🧠 TASK FILE IMMUTABILITY
+
+YOU MUST NOT:
+
+* Modify task file  
+
+EXCEPTION:
+
+* State sync metadata  
+
+---
+
+# 📊 TASK BOARD CONTROL LAW
+
+TASK_BOARD MUST:
+
+* Define CURRENT TASK  
+* Maintain order  
+* Mark completion  
+
+---
+
+# 🔄 STATE SYNC COMPATIBILITY
+
+IF MISMATCH:
 
 YOU MUST:
 
-* Validate against ALL rule files
-
-CHECK:
-
-* MASTER_RULES
-* STACK_RULES
-* SECURITY_RULES
-
-IF ANY VIOLATION:
-
-→ STOP
-
----
-
-# ⚙️ CHANGE MINIMIZATION LAW
-
-YOU MUST:
-
-* Modify minimum required code
+1. Read TASK_BOARD  
+2. Sync PROJECT_STATE  
+3. Sync ACTIVE TASK  
 
 YOU MUST NOT:
 
-* Rewrite entire file
-* Refactor unrelated code
+* Hard stop immediately  
+
+STOP ONLY IF:
+
+* TASK_BOARD invalid  
+* Task missing  
+* Conflict exists  
 
 ---
 
-# 🔁 RE-RUN PROTECTION
-
-YOU MUST:
-
-* Check existing output
-
-YOU MUST NOT:
-
-* Create duplicate output
-
-IF EXISTS:
-
-→ STOP
-
----
-
-# 📊 OUTPUT CONTROL LAW
-
-YOU MUST RETURN:
-
-1. Files created / modified
-2. Code
-3. Short explanation
-
-YOU MUST NOT:
-
-* Add suggestions
-* Add extra commentary
-
----
-
-# 🧾 EXPECTED OUTPUT MATCH
-
-IF TASK DEFINES OUTPUT:
-
-→ MATCH EXACTLY
-
-YOU MUST NOT:
-
-* Deliver partial output
-* Change format
-
----
-
-# 🛑 EXECUTION FAILURE CONDITIONS
+# 🛑 INVALID TASK CONDITIONS
 
 STOP IF:
 
-* Task unclear
-* Task incomplete
-* Dependency missing
-* Rule conflict
-* Duplicate logic
-* File mismatch
-* Security violation
-* Side effect risk
+* Missing fields  
+* Invalid path  
+* Scope unclear  
+* Duplicate  
+* Already completed  
 
 ---
 
-# 🔐 FAIL-SAFE EXECUTION
+# 🧠 BEHAVIOR RULES
 
-DEFAULT:
+YOU MUST:
 
-→ DO NOT EXECUTE
+* Be deterministic  
+* Be strict  
 
-IF ANY DOUBT:
+YOU MUST NOT:
 
-→ STOP
+* Think beyond task  
+* Optimize  
+* Improve  
+
+---
+
+# 🚨 CRITICAL SAFETY RULE
+
+IF TASK RISKS:
+
+* Stability  
+* Security  
+* Data  
+
+→ STOP  
 
 ---
 
-# 🚨 FINAL EXECUTION LAW
+# 📌 FINAL TASK LAW
 
-YOU ARE:
+TASK = ABSOLUTE EXECUTION UNIT  
 
-* STRICT
-* CONTROLLED
-* STEP-BASED
+EXECUTE:
 
-YOU EXECUTE:
-
-* ONE TASK
-* ONE STEP
-
-NOTHING MORE
+* EXACTLY  
+* FULLY  
+* ONCE  
 
 ---
-SYSTEM TASK EXCEPTION
 
-Allowed format:
+# 🔒 COMPLETION DEFINITION (NEW — CRITICAL)
 
-SYSTEM-*.md
+TASK IS COMPLETE ONLY IF:
 
-These tasks:
+✔ Code executed  
+✔ Files updated  
+✔ Task file moved to completed  
 
-- Do not follow phase order
-- Must be READ ONLY
-- Must not modify system
+IF ANY MISSING:
 
-If SYSTEM task:
+→ TASK INCOMPLETE  
+→ BLOCK SYSTEM  
 
-→ Skip phase validation
+---
 
 # 🔚 END OF TASK RULES
